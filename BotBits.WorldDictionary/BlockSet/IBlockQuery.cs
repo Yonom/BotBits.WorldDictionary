@@ -9,7 +9,7 @@ namespace BotBits.WorldDictionary
         where TItem : struct
     {
         IEnumerable<Point> Locations { get; }
-        bool Contains(Point item);
+        bool Contains(Point point);
         int Count { get; }
         TKey Key { get; }
 

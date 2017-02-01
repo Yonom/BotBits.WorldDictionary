@@ -13,19 +13,23 @@ namespace BotBits.WorldDictionary
         private readonly IBlockAreaEnumerable _blockArea;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        public BlocksAreaDictionary(BotBitsClient client, IBlockAreaEnumerable blockArea)
+        public BlocksAreaDictionary(IBlockAreaEnumerable blockArea, BotBitsClient client, IBlockFilter filter)
         {
             this._client = client;
             this._blockArea = blockArea;
 
-            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem>(
-                new ForegroundDictionaryLayerGenerator<BlocksItem>((p, b) => this._blockArea.At(p.X, p.Y)));
-            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem>(
-                new BackgroundDictionaryLayerGenerator<BlocksItem>((p, b) => this._blockArea.At(p.X, p.Y)));
+            var fgGen = new ForegroundDictionaryLayerGenerator<BlocksItem>((p, b) => this._blockArea.At(p.X, p.Y));
+            var bgGen = new BackgroundDictionaryLayerGenerator<BlocksItem>((p, b) => this._blockArea.At(p.X, p.Y));
+            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem>(fgGen, filter);
+            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem>(bgGen, filter);
 
             this.Reindex();
             
             EventLoader.Of(this._client).Load(this);
+        }
+
+        public BlocksAreaDictionary(IBlockAreaEnumerable blockArea, BotBitsClient client) : this(blockArea, client, DefaultBlockFilter.Value)
+        {
         }
 
         public int Width { get; private set; }

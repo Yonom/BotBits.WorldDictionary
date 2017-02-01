@@ -16,7 +16,7 @@ namespace BotBits.WorldDictionary
 
         private void BlocksDictionary_InitializeFinish(object sender, EventArgs e)
         {
-            this._blocksAreaDictionary = new BlocksAreaDictionary(this.BotBits, Blocks.Of(this.BotBits));
+            this._blocksAreaDictionary = new BlocksAreaDictionary(Blocks.Of(this.BotBits), this.BotBits);
         }
 
         public int Width => this._blocksAreaDictionary.Width;

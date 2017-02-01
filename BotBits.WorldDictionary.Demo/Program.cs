@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Authentication.ExtendedProtection;
 using System.Text;
+using System.Threading;
 
 namespace BotBits.WorldDictionary.Demo
 {
@@ -24,19 +26,20 @@ namespace BotBits.WorldDictionary.Demo
             //Login.Of(bot)
             //    .AsGuest()
             //    .CreateJoinRoom("PW01");
+            
 
-            var world = new World(1000, 1000);
-            var dic = world.ToWorldDictionary();
+            var dic = new World(1000, 1000).ToWorldDictionary();
+            Test(dic);
+        }
 
-            var sw = Stopwatch.StartNew();
-            world.Set(Foreground.Basic.Blue);
-            sw.Stop();
-
+        public static void Test(WorldDictionary dic)
+        {
             var sws = Stopwatch.StartNew();
+            for (var i = 0; i < 10; i++)
             dic.Foreground.GroupedByBlock.SetMany(Foreground.Basic.Blue);
             sws.Stop();
 
-            Console.WriteLine(dic.Foreground[Foreground.Empty].Count);
+            Console.WriteLine(dic.Foreground[new ForegroundBlock(Foreground.Empty)].Count);
         }
     }
 }

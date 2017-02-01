@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BotBits, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\BotBits.219.3.4\lib\net40\BotBits.dll</HintPath>
+      <HintPath>..\packages\BotBits.219.3.6\lib\net40\BotBits.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PlayerIOClient, Version=2.3.6.0, Culture=neutral, PublicKeyToken=c7f7b730653f6a44, processorArchitecture=MSIL">
@@ -64,6 +64,7 @@
     <Compile Include="Generators\IDictionaryLayerGenerator.cs" />
     <Compile Include="IReadOnlyWorldDictionary.cs" />
     <Compile Include="IWorldDictionary.cs" />
+    <Compile Include="PointSlim.cs" />
     <Compile Include="WorldDictionaryExtensions.cs" />
     <Compile Include="WorldDictionaryItem.cs" />
     <Compile Include="WorldDictionary.cs" />

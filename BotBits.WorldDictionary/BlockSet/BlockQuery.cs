@@ -31,11 +31,11 @@ namespace BotBits.WorldDictionary
 
         public int Count => this._set.Count;
 
-        public IEnumerable<Point> Locations => this._set.Keys;
+        public IEnumerable<Point> Locations => this._set.Keys.Select(p => new Point(p.X, p.Y));
 
         public IEnumerator<TItem> GetEnumerator()
         {
-            return this._set.Select(p => this._generator.GenerateItem(p.Key, this.Key)).GetEnumerator();
+            return this._set.Select(p => this._generator.GenerateItem(new Point(p.Key.X, p.Key.Y), this.Key)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -43,9 +43,9 @@ namespace BotBits.WorldDictionary
             return ((IEnumerable)this._set).GetEnumerator();
         }
 
-        public bool Contains(Point item)
+        public bool Contains(Point point)
         {
-            return this._set.ContainsKey(item);
+            return this._set.ContainsKey(new Point((ushort)point.X, (ushort)point.Y));
         }
     }
 }

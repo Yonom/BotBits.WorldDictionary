@@ -26,16 +26,16 @@ namespace BotBits.WorldDictionary
 
         public TItem At(Point point)
         {
-            var block = this._sets.Where(s => s.Value.ContainsKey(point)).Select(s => s.Key).Cast<TBlock?>().FirstOrDefault();
+            var block = this._sets.Where(s => s.Value.ContainsKey((Point)point)).Select(s => s.Key).Cast<TBlock?>().FirstOrDefault();
             if (!block.HasValue) throw new KeyNotFoundException("The given block id does not exist at the given point.");
             return this._generator.GenerateItem(point, block.Value);
         }
 
-        public IEnumerable<Point> Locations => this._sets.SelectMany(s => s.Value.Keys);
+        public IEnumerable<Point> Locations => this._sets.SelectMany(s => s.Value.Keys).Select(p => new Point(p.X, p.Y));
 
         public IEnumerator<TItem> GetEnumerator()
         {
-            return this._sets.SelectMany(s => s.Value.Select(v => this._generator.GenerateItem(v.Key, s.Key))).GetEnumerator();
+            return this._sets.SelectMany(s => s.Value.Select(v => this._generator.GenerateItem(new Point(v.Key.X, v.Key.Y), s.Key))).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -43,9 +43,9 @@ namespace BotBits.WorldDictionary
             return this.GetEnumerator();
         }
 
-        public bool Contains(Point item)
+        public bool Contains(Point point)
         {
-            return this._sets.Any(s => s.Value.ContainsKey(item));
+            return this._sets.Any(s => s.Value.ContainsKey((Point)point));
         }
     }
 }
