@@ -6,15 +6,16 @@ using System.Linq;
 
 namespace BotBits.WorldDictionary
 {
-    internal class DictionaryBlockLayer<TId, TBlock, TItem> : IDictionaryBlockLayer<TId, TBlock, TItem>
+    internal class DictionaryBlockLayer<TId, TBlock, TItem, TPointSet> : IDictionaryBlockLayer<TId, TBlock, TItem>
         where TId : struct
         where TBlock : struct
         where TItem : struct
+        where TPointSet : IPointSet, new()
     {
         private readonly IBlockFilter<TId, TBlock> _filter;
         private readonly IDictionaryLayerGenerator<TId, TBlock, TItem> _generator;
 
-        private readonly ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>> _items = new ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>>();
+        private readonly ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, TPointSet>> _items = new ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, TPointSet>>();
 
         public DictionaryBlockLayer(IDictionaryLayerGenerator<TId, TBlock, TItem> generator, IBlockFilter<TId, TBlock> filter)
         {
@@ -32,10 +33,10 @@ namespace BotBits.WorldDictionary
 
                 if (this._filter.ShouldIndex(id, block) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
 
-                var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
-                var res = dic.GetOrAdd(block, _ => new ConcurrentDictionary<Point, byte>());
+                var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
+                var res = dic.GetOrAdd(block, _ => new TPointSet());
 
-                return new BlockQuery<TId, TBlock, TItem>(block, res, this._generator);
+                return new BlockQuery<TId, TBlock, TItem, TPointSet>(block, res, this._generator);
             }
         }
 
@@ -45,9 +46,9 @@ namespace BotBits.WorldDictionary
             {
                 if (this._filter.ShouldIndex(id, null) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
 
-                var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
+                var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
 
-                return new AggregateBlockQuery<TId, TBlock, TItem>(id, dic, this._generator);
+                return new AggregateBlockQuery<TId, TBlock, TItem, TPointSet>(id, dic, this._generator);
             }
         }
 
@@ -94,30 +95,29 @@ namespace BotBits.WorldDictionary
             return this.GetEnumerator();
         }
 
-        internal bool Add(TBlock block, Point point)
+        internal void Add(TBlock block, Point point)
         {
             var id = this._generator.GetId(block);
 
             //if (this._filter.ShouldIndex(id, block) == false) return false;
 
-            var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
-            var res = dic.GetOrAdd(block, _ => new ConcurrentDictionary<Point, byte>());
+            var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
+            var res = dic.GetOrAdd(block, _ => new TPointSet());
 
-            return res.TryAdd(point, default(byte));
+            res.Add(point);
         }
 
         internal bool Remove(TBlock block, Point point)
         {
             var id = this._generator.GetId(block);
 
-            ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>> dic;
+            ConcurrentDictionary<TBlock, TPointSet> dic;
             if (!this._items.TryGetValue(id, out dic)) return false;
 
-            ConcurrentDictionary<Point, byte> set;
+            TPointSet set;
             if (!dic.TryGetValue(block, out set)) return false;
-
-            byte useless;
-            return set.TryRemove(point, out useless);
+            
+            return set.Remove(point);
         }
 
         internal void Clear()

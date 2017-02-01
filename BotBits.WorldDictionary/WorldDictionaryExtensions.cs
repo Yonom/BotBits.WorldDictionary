@@ -2,12 +2,14 @@ namespace BotBits.WorldDictionary
 {
     public static class WorldDictionaryExtensions
     {
-        public static World ToWorld<T>(this IReadOnlyWorldDictionary<T> worldDictionary) where T : struct
+        public static WorldDictionary ToWorldDictionary(this IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
         {
-            var world = new World(worldDictionary.Width, worldDictionary.Height);
-            foreach (var block in worldDictionary.Foreground.GroupedByBlock) foreach (var location in block.Locations) world.Foreground[location] = block.Key;
-            foreach (var block in worldDictionary.Background.GroupedByBlock) foreach (var location in block.Locations) world.Background[location] = block.Key;
-            return world;
+            return new WorldDictionary(worldArea, filter);
+        }
+
+        public static WorldDictionary ToWorldDictionary(this IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
+        {
+            return new WorldDictionary(worldArea, filter);
         }
 
         public static WorldDictionary ToWorldDictionary(this IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
@@ -19,6 +21,7 @@ namespace BotBits.WorldDictionary
         {
             return new WorldDictionary(worldArea);
         }
+
 
         public static void Update<T>(this IWorldDictionary<T> worldDictionary, int x, int y, ForegroundBlock oldBlock, ForegroundBlock newBlock) where T : struct
         {

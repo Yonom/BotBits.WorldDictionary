@@ -6,15 +6,16 @@ using System.Linq;
 namespace BotBits.WorldDictionary
 {
 
-    internal class BlockQuery<TId, TKey, TItem> : IBlockQuery<TKey, TItem>
+    internal class BlockQuery<TId, TKey, TItem, TPointSet> : IBlockQuery<TKey, TItem>
         where TId : struct
         where TKey : struct
         where TItem : struct
+        where TPointSet : IPointSet
     {
         private readonly IDictionaryLayerGenerator<TId, TKey, TItem> _generator;
-        private readonly ConcurrentDictionary<Point, byte> _set;
+        private readonly TPointSet _set;
 
-        public BlockQuery(TKey key, ConcurrentDictionary<Point, byte> set, IDictionaryLayerGenerator<TId, TKey, TItem> generator)
+        public BlockQuery(TKey key, TPointSet set, IDictionaryLayerGenerator<TId, TKey, TItem> generator)
         {
             this.Key = key;
             this._set = set;
@@ -31,11 +32,11 @@ namespace BotBits.WorldDictionary
 
         public int Count => this._set.Count;
 
-        public IEnumerable<Point> Locations => this._set.Keys;
+        public IEnumerable<Point> Locations => this._set;
 
         public IEnumerator<TItem> GetEnumerator()
         {
-            return this._set.Select(p => this._generator.GenerateItem(p.Key, this.Key)).GetEnumerator();
+            return this._set.Select(p => this._generator.GenerateItem(p, this.Key)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -45,7 +46,7 @@ namespace BotBits.WorldDictionary
 
         public bool Contains(Point point)
         {
-            return this._set.ContainsKey(point);
+            return this._set.Contains(point);
         }
     }
 }

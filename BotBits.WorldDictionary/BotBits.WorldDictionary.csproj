@@ -50,20 +50,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlockSet\AggregateBlockQuery.cs" />
-    <Compile Include="BlockSet\BlockQueryExtensions.cs" />
+    <Compile Include="BlockQuery\AggregateBlockQuery.cs" />
+    <Compile Include="BlockQuery\BlockQueryExtensions.cs" />
+    <Compile Include="BlockFilter\DefaultBlockFilter.cs" />
+    <Compile Include="PointSet\PointSet.cs" />
     <Compile Include="Generators\BackgroundDictionaryLayerGenerator.cs" />
-    <Compile Include="BlocksAreaDictionary.cs" />
-    <Compile Include="BlocksDictionary.cs" />
+    <Compile Include="Blocks\BlocksAreaDictionary.cs" />
+    <Compile Include="Blocks\BlocksDictionary.cs" />
     <Compile Include="BlocksDictionaryExtension.cs" />
-    <Compile Include="BlockSet\BlockQuery.cs" />
+    <Compile Include="BlockQuery\BlockQuery.cs" />
     <Compile Include="DictionaryBlockLayer.cs" />
     <Compile Include="Generators\ForegroundDictionaryLayerGenerator.cs" />
-    <Compile Include="BlockSet\IBlockQuery.cs" />
+    <Compile Include="BlockQuery\IBlockQuery.cs" />
+    <Compile Include="BlockFilter\IBlockFilter.cs" />
     <Compile Include="IDictionaryBlockLayer.cs" />
     <Compile Include="Generators\IDictionaryLayerGenerator.cs" />
-    <Compile Include="IReadOnlyWorldDictionary.cs" />
+    <Compile Include="PointSet\IPointSet.cs" />
+    <Compile Include="ReadOnly\IReadOnlyWorldDictionary.cs" />
     <Compile Include="IWorldDictionary.cs" />
+    <Compile Include="PointSet\ReadOnlyPointSet.cs" />
+    <Compile Include="ReadOnly\ReadOnlyWorldDictionary.cs" />
+    <Compile Include="ReadOnly\ReadOnlyWorldDictionaryItem.cs" />
+    <Compile Include="ReadOnly\ReadOnlyWorldDictionaryExtensions.cs" />
     <Compile Include="WorldDictionaryExtensions.cs" />
     <Compile Include="WorldDictionaryItem.cs" />
     <Compile Include="WorldDictionary.cs" />

@@ -2,33 +2,8 @@
 
 namespace BotBits.WorldDictionary
 {
-    public interface IBlockFilter<in TId, TBlock> where TId : struct where TBlock : struct
-    {
-        bool ShouldIndex(TId id, TBlock? block);
-    }
-
     public interface IBlockFilter : IBlockFilter<Foreground.Id, ForegroundBlock>, IBlockFilter<Background.Id, BackgroundBlock>
     {
-    }
-
-
-    internal class DefaultBlockFilter : IBlockFilter
-    {
-        private DefaultBlockFilter()
-        {
-        }
-
-        public static DefaultBlockFilter Value { get; } = new DefaultBlockFilter();
-
-        public bool ShouldIndex(Foreground.Id id, ForegroundBlock? block)
-        {
-            return true;
-        }
-
-        public bool ShouldIndex(Background.Id id, BackgroundBlock? block)
-        {
-            return true;
-        }
     }
 
     public class WorldDictionary : IWorldDictionary<WorldDictionaryItem>
@@ -38,8 +13,8 @@ namespace BotBits.WorldDictionary
             if (worldArea.Area.Width > ushort.MaxValue || worldArea.Area.Height > ushort.MaxValue) throw new NotSupportedException($"WorldDictionary only supports worlds that are {ushort.MaxValue} wide or tall at maximum.");
             var fgGen = new ForegroundDictionaryLayerGenerator<WorldDictionaryItem>((p, b) => new WorldDictionaryItem(this, b, p.X, p.Y));
             var bgGen = new BackgroundDictionaryLayerGenerator<WorldDictionaryItem>((p, b) => new WorldDictionaryItem(this, b, p.X, p.Y));
-            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem>(fgGen, filter);
-            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem>(bgGen, filter);
+            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem, PointSet>(fgGen, filter);
+            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem, PointSet>(bgGen, filter);
 
             this.Width = worldArea.Area.Width;
             this.Height = worldArea.Area.Height;
@@ -69,8 +44,8 @@ namespace BotBits.WorldDictionary
         {
         }
 
-        private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem> InternalForeground { get; }
-        private DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem> InternalBackground { get; }
+        private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem, PointSet> InternalForeground { get; }
+        private DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem, PointSet> InternalBackground { get; }
 
         public int Width { get; }
         public int Height { get; }

@@ -17,8 +17,8 @@ namespace BotBits.WorldDictionary
 
             var fgGen = new ForegroundDictionaryLayerGenerator<BlocksItem>((p, b) => this._blockArea.At(p.X, p.Y));
             var bgGen = new BackgroundDictionaryLayerGenerator<BlocksItem>((p, b) => this._blockArea.At(p.X, p.Y));
-            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem>(fgGen, filter);
-            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem>(bgGen, filter);
+            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem, PointSet>(fgGen, filter);
+            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem, PointSet>(bgGen, filter);
 
             this.Reindex();
 
@@ -29,9 +29,6 @@ namespace BotBits.WorldDictionary
         {
         }
 
-        private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem> InternalForeground { get; }
-        private DictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem> InternalBackground { get; }
-
         public void Dispose()
         {
             EventLoader.Of(this._client).Unload(this);
@@ -39,6 +36,9 @@ namespace BotBits.WorldDictionary
 
         public int Width { get; private set; }
         public int Height { get; private set; }
+
+        private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem, PointSet> InternalForeground { get; }
+        private DictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem, PointSet> InternalBackground { get; }
         public IDictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem> Foreground => this.InternalForeground;
         public IDictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem> Background => this.InternalBackground;
 
