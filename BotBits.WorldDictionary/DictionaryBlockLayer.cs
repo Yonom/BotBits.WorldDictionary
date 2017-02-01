@@ -11,16 +11,16 @@ namespace BotBits.WorldDictionary
         where TBlock : struct
         where TItem : struct
     {
-        private readonly IDictionaryLayerGenerator<TId, TBlock, TItem> _generator;
         private readonly IBlockFilter<TId, TBlock> _filter;
+        private readonly IDictionaryLayerGenerator<TId, TBlock, TItem> _generator;
+
+        private readonly ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>> _items = new ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>>();
 
         public DictionaryBlockLayer(IDictionaryLayerGenerator<TId, TBlock, TItem> generator, IBlockFilter<TId, TBlock> filter)
         {
             this._generator = generator;
             this._filter = filter;
         }
-
-        private readonly ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>> _items = new ConcurrentDictionary<TId, ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>>();
 
         public int Count => this._items.Values.Count(i => i.Count > 0);
 
@@ -30,8 +30,7 @@ namespace BotBits.WorldDictionary
             {
                 var id = this._generator.GetId(block);
 
-                if (this._filter?.ShouldIndex(id, block) == false)
-                    throw new NotSupportedException("This Dictionary does not support the given block.");
+                if (this._filter.ShouldIndex(id, block) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
 
                 var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
                 var res = dic.GetOrAdd(block, _ => new ConcurrentDictionary<Point, byte>());
@@ -44,44 +43,12 @@ namespace BotBits.WorldDictionary
         {
             get
             {
-                if (this._filter?.ShouldIndex(id, null) == false)
-                    throw new NotSupportedException("This Dictionary does not support the given block.");
+                if (this._filter.ShouldIndex(id, null) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
 
                 var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
 
                 return new AggregateBlockQuery<TId, TBlock, TItem>(id, dic, this._generator);
             }
-        }
-
-        internal bool Add(TBlock block, Point point)
-        {
-            var id = this._generator.GetId(block);
-
-            if (this._filter?.ShouldIndex(id, block) == false) return false;
-
-            var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
-            var res = dic.GetOrAdd(block, _ => new ConcurrentDictionary<Point, byte>());
-
-            return res.TryAdd((Point)point, default(byte));
-        }
-
-        internal bool Remove(TBlock block, Point point)
-        {
-            var id = this._generator.GetId(block);
-
-            ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>> dic;
-            if (!this._items.TryGetValue(id, out dic)) return false;
-
-            ConcurrentDictionary<Point, byte> set;
-            if (!dic.TryGetValue(block, out set)) return false;
-
-            byte useless;
-            return set.TryRemove((Point)point, out useless);
-        }
-
-        internal void Clear()
-        {
-            this._items.Clear();
         }
 
         public IEnumerable<KeyValuePair<TId, IEnumerable<IBlockQuery<TBlock, TItem>>>> GroupedByIdThenByBlock
@@ -125,6 +92,37 @@ namespace BotBits.WorldDictionary
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        internal bool Add(TBlock block, Point point)
+        {
+            var id = this._generator.GetId(block);
+
+            //if (this._filter.ShouldIndex(id, block) == false) return false;
+
+            var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>>());
+            var res = dic.GetOrAdd(block, _ => new ConcurrentDictionary<Point, byte>());
+
+            return res.TryAdd(point, default(byte));
+        }
+
+        internal bool Remove(TBlock block, Point point)
+        {
+            var id = this._generator.GetId(block);
+
+            ConcurrentDictionary<TBlock, ConcurrentDictionary<Point, byte>> dic;
+            if (!this._items.TryGetValue(id, out dic)) return false;
+
+            ConcurrentDictionary<Point, byte> set;
+            if (!dic.TryGetValue(block, out set)) return false;
+
+            byte useless;
+            return set.TryRemove(point, out useless);
+        }
+
+        internal void Clear()
+        {
+            this._items.Clear();
         }
     }
 }

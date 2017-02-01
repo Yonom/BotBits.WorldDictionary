@@ -17,6 +17,11 @@ namespace BotBits.WorldDictionary
             return this._itemGenerator(point, block);
         }
 
+        public Foreground.Id GetId(ForegroundBlock block)
+        {
+            return block.Id;
+        }
+
         public ForegroundBlock GenerateBlock(Foreground.Id id)
         {
             try
@@ -27,11 +32,6 @@ namespace BotBits.WorldDictionary
             {
                 throw new NotSupportedException("There is no Block assosicated with this query.", ex);
             }
-        }
-
-        public Foreground.Id GetId(ForegroundBlock block)
-        {
-            return block.Id;
         }
     }
 }

@@ -14,12 +14,11 @@ namespace BotBits.WorldDictionary
 
     internal class DefaultBlockFilter : IBlockFilter
     {
-        public static DefaultBlockFilter Value { get; } = new DefaultBlockFilter();
-
         private DefaultBlockFilter()
         {
-            
         }
+
+        public static DefaultBlockFilter Value { get; } = new DefaultBlockFilter();
 
         public bool ShouldIndex(Foreground.Id id, ForegroundBlock? block)
         {
@@ -36,8 +35,7 @@ namespace BotBits.WorldDictionary
     {
         public WorldDictionary(IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
         {
-            if (worldArea.Area.Width > ushort.MaxValue || worldArea.Area.Height > ushort.MaxValue)
-                throw new NotSupportedException($"WorldDictionary only supports worlds that are {ushort.MaxValue} wide or tall at maximum.");
+            if (worldArea.Area.Width > ushort.MaxValue || worldArea.Area.Height > ushort.MaxValue) throw new NotSupportedException($"WorldDictionary only supports worlds that are {ushort.MaxValue} wide or tall at maximum.");
             var fgGen = new ForegroundDictionaryLayerGenerator<WorldDictionaryItem>((p, b) => new WorldDictionaryItem(this, b, p.X, p.Y));
             var bgGen = new BackgroundDictionaryLayerGenerator<WorldDictionaryItem>((p, b) => new WorldDictionaryItem(this, b, p.X, p.Y));
             this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem>(fgGen, filter);
@@ -62,20 +60,20 @@ namespace BotBits.WorldDictionary
         }
 
         public WorldDictionary(IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
-            : this(worldArea, null)
+            : this(worldArea, DefaultBlockFilter.Value)
         {
         }
 
-        public WorldDictionary(IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea) 
-            : this(worldArea, null)
+        public WorldDictionary(IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
+            : this(worldArea, DefaultBlockFilter.Value)
         {
         }
+
+        private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem> InternalForeground { get; }
+        private DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem> InternalBackground { get; }
 
         public int Width { get; }
         public int Height { get; }
-         
-        private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem> InternalForeground { get; }
-        private DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem> InternalBackground { get; }
         public IDictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem> Foreground => this.InternalForeground;
         public IDictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem> Background => this.InternalBackground;
 
@@ -110,8 +108,7 @@ namespace BotBits.WorldDictionary
 
         public bool TryUpdate(Point point, BackgroundBlock oldBlock, BackgroundBlock newBlock)
         {
-            if (!this.InternalBackground.Remove(oldBlock, point))
-                return false;
+            if (!this.InternalBackground.Remove(oldBlock, point)) return false;
 
             this.InternalBackground.Add(newBlock, point);
             return true;

@@ -5,13 +5,13 @@ using System.Linq;
 
 namespace BotBits.WorldDictionary
 {
-    internal class AggregateBlockQuery<TKey, TBlock, TItem> : IBlockQuery<TKey, TItem> 
+    internal class AggregateBlockQuery<TKey, TBlock, TItem> : IBlockQuery<TKey, TItem>
         where TKey : struct
         where TBlock : struct
-        where TItem : struct 
+        where TItem : struct
     {
-        private readonly IEnumerable<KeyValuePair<TBlock, ConcurrentDictionary<Point, byte>>> _sets;
         private readonly IDictionaryLayerGenerator<TKey, TBlock, TItem> _generator;
+        private readonly IEnumerable<KeyValuePair<TBlock, ConcurrentDictionary<Point, byte>>> _sets;
 
         public AggregateBlockQuery(TKey key, IEnumerable<KeyValuePair<TBlock, ConcurrentDictionary<Point, byte>>> sets, IDictionaryLayerGenerator<TKey, TBlock, TItem> generator)
         {
@@ -26,16 +26,16 @@ namespace BotBits.WorldDictionary
 
         public TItem At(Point point)
         {
-            var block = this._sets.Where(s => s.Value.ContainsKey((Point)point)).Select(s => s.Key).Cast<TBlock?>().FirstOrDefault();
+            var block = this._sets.Where(s => s.Value.ContainsKey(point)).Select(s => s.Key).Cast<TBlock?>().FirstOrDefault();
             if (!block.HasValue) throw new KeyNotFoundException("The given block id does not exist at the given point.");
             return this._generator.GenerateItem(point, block.Value);
         }
 
-        public IEnumerable<Point> Locations => this._sets.SelectMany(s => s.Value.Keys).Select(p => new Point(p.X, p.Y));
+        public IEnumerable<Point> Locations => this._sets.SelectMany(s => s.Value.Keys);
 
         public IEnumerator<TItem> GetEnumerator()
         {
-            return this._sets.SelectMany(s => s.Value.Select(v => this._generator.GenerateItem(new Point(v.Key.X, v.Key.Y), s.Key))).GetEnumerator();
+            return this._sets.SelectMany(s => s.Value.Select(v => this._generator.GenerateItem(v.Key, s.Key))).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -45,7 +45,7 @@ namespace BotBits.WorldDictionary
 
         public bool Contains(Point point)
         {
-            return this._sets.Any(s => s.Value.ContainsKey((Point)point));
+            return this._sets.Any(s => s.Value.ContainsKey(point));
         }
     }
 }

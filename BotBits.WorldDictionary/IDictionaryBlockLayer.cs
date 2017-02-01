@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace BotBits.WorldDictionary
 {
-    public interface IDictionaryBlockLayer<TId, TBlock, TItem> 
+    public interface IDictionaryBlockLayer<TId, TBlock, TItem>
         : IEnumerable<IBlockQuery<TId, TItem>>
         where TId : struct
         where TBlock : struct

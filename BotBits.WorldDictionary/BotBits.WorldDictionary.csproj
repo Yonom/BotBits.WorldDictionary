@@ -64,7 +64,6 @@
     <Compile Include="Generators\IDictionaryLayerGenerator.cs" />
     <Compile Include="IReadOnlyWorldDictionary.cs" />
     <Compile Include="IWorldDictionary.cs" />
-    <Compile Include="PointSlim.cs" />
     <Compile Include="WorldDictionaryExtensions.cs" />
     <Compile Include="WorldDictionaryItem.cs" />
     <Compile Include="WorldDictionary.cs" />

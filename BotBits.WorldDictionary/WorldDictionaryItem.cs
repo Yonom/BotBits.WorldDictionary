@@ -3,7 +3,7 @@ using System;
 namespace BotBits.WorldDictionary
 {
     public struct WorldDictionaryItem : IBlockSettable<ForegroundBlock, BackgroundBlock>
-    { 
+    {
         private readonly IWorldDictionary<WorldDictionaryItem> _worldDictionary;
         private readonly ForegroundBlock? _foreground;
         private readonly BackgroundBlock? _background;
@@ -25,14 +25,12 @@ namespace BotBits.WorldDictionary
         {
             get
             {
-                if (!this._foreground.HasValue)
-                    throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
+                if (!this._foreground.HasValue) throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
                 return this._foreground.Value;
             }
             set
             {
-                if (this.Layer != Layer.Foreground)
-                    throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
+                if (this.Layer != Layer.Foreground) throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
                 this._worldDictionary.Update(new Point(this.X, this.Y), this.Foreground, value);
             }
         }
@@ -41,14 +39,12 @@ namespace BotBits.WorldDictionary
         {
             get
             {
-                if (!this._background.HasValue)
-                    throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
+                if (!this._background.HasValue) throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
                 return this._background.Value;
             }
             set
             {
-                if (this.Layer != Layer.Background)
-                    throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
+                if (this.Layer != Layer.Background) throw new NotSupportedException("Tried to access the wrong layer on WorldDictionaryItem.");
                 this._worldDictionary.Update(new Point(this.X, this.Y), this.Background, value);
             }
         }

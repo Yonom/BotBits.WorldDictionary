@@ -1,22 +1,15 @@
 using System;
-using BotBits.Events;
-using Microsoft.Win32.SafeHandles;
 
 namespace BotBits.WorldDictionary
 {
     public sealed class BlocksDictionary : Package<BlocksDictionary>, IReadOnlyWorldDictionary<BlocksItem>
     {
         private BlocksAreaDictionary _blocksAreaDictionary;
-        
+
         [Obsolete("Invalid to use \"new\" on this class. Use the static .Of(BotBits) method instead.", true)]
         public BlocksDictionary()
         {
             this.InitializeFinish += this.BlocksDictionary_InitializeFinish;
-        }
-
-        private void BlocksDictionary_InitializeFinish(object sender, EventArgs e)
-        {
-            this._blocksAreaDictionary = new BlocksAreaDictionary(Blocks.Of(this.BotBits), this.BotBits);
         }
 
         public int Width => this._blocksAreaDictionary.Width;
@@ -29,5 +22,10 @@ namespace BotBits.WorldDictionary
 
         public IDictionaryBlockLayer<Foreground.Id, ForegroundBlock, BlocksItem> Foreground => this._blocksAreaDictionary.Foreground;
         public IDictionaryBlockLayer<Background.Id, BackgroundBlock, BlocksItem> Background => this._blocksAreaDictionary.Background;
+
+        private void BlocksDictionary_InitializeFinish(object sender, EventArgs e)
+        {
+            this._blocksAreaDictionary = new BlocksAreaDictionary(Blocks.Of(this.BotBits), this.BotBits);
+        }
     }
 }
