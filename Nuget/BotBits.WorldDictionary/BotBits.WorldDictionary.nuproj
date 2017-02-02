@@ -22,7 +22,7 @@
   <Import Project="$(NuProjPath)\NuProj.props" Condition="Exists('$(NuProjPath)\NuProj.props')" />
   <PropertyGroup Label="Configuration">
     <Id>BotBits.WorldDictionary</Id>
-    <Version>1.0.0</Version>
+    <Version>1.0.2</Version>
     <Title>BotBits.WorldDictionary</Title>
     <Authors>Younom</Authors>
     <Owners>Younom</Owners>
