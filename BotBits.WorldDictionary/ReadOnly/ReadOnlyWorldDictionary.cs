@@ -32,12 +32,12 @@ namespace BotBits.WorldDictionary
         }
 
         public ReadOnlyWorldDictionary(IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
-            : this(worldArea, DefaultBlockFilter.Value)
+            : this(worldArea, null)
         {
         }
 
         public ReadOnlyWorldDictionary(IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
-            : this(worldArea, DefaultBlockFilter.Value)
+            : this(worldArea, null)
         {
         }
 

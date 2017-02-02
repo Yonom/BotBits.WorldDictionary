@@ -8,13 +8,13 @@ namespace BotBits.WorldDictionary
 
     public class WorldDictionary : IWorldDictionary<WorldDictionaryItem>
     {
-        public WorldDictionary(IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
+        public WorldDictionary(IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
         {
             if (worldArea.Area.Width > ushort.MaxValue || worldArea.Area.Height > ushort.MaxValue) throw new NotSupportedException($"WorldDictionary only supports worlds that are {ushort.MaxValue} wide or tall at maximum.");
             var fgGen = new ForegroundDictionaryLayerGenerator<WorldDictionaryItem>((p, b) => new WorldDictionaryItem(this, b, p.X, p.Y));
             var bgGen = new BackgroundDictionaryLayerGenerator<WorldDictionaryItem>((p, b) => new WorldDictionaryItem(this, b, p.X, p.Y));
-            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem, PointSet>(fgGen, filter);
-            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem, PointSet>(bgGen, filter);
+            this.InternalForeground = new DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem, PointSet>(fgGen, null);
+            this.InternalBackground = new DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem, PointSet>(bgGen, null);
 
             this.Width = worldArea.Area.Width;
             this.Height = worldArea.Area.Height;
@@ -29,21 +29,10 @@ namespace BotBits.WorldDictionary
             }
         }
 
-        public WorldDictionary(IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
-            : this(worldArea.ToReadOnlyWorldAreaEnumerable(), filter)
-        {
-        }
-
-        public WorldDictionary(IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
-            : this(worldArea, DefaultBlockFilter.Value)
-        {
-        }
-
         public WorldDictionary(IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
-            : this(worldArea, DefaultBlockFilter.Value)
+            : this(worldArea.ToReadOnlyWorldAreaEnumerable())
         {
         }
-
         private DictionaryBlockLayer<Foreground.Id, ForegroundBlock, WorldDictionaryItem, PointSet> InternalForeground { get; }
         private DictionaryBlockLayer<Background.Id, BackgroundBlock, WorldDictionaryItem, PointSet> InternalBackground { get; }
 

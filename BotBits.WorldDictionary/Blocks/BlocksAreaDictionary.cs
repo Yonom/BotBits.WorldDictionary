@@ -3,15 +3,16 @@ using System.Threading;
 using BotBits.Events;
 
 namespace BotBits.WorldDictionary
-{
-    public class BlocksAreaDictionary : IReadOnlyWorldDictionary<BlocksItem>, IDisposable
+{ 
+    // THis class is internal 
+    internal class BlocksAreaDictionary : IReadOnlyWorldDictionary<BlocksItem>, IDisposable
     {
         private readonly IBlockAreaEnumerable _blockArea;
         private readonly BotBitsClient _client;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         public BlocksAreaDictionary(IBlockAreaEnumerable blockArea, BotBitsClient client, IBlockFilter filter)
-        {
+        { 
             this._client = client;
             this._blockArea = blockArea;
 
@@ -25,7 +26,7 @@ namespace BotBits.WorldDictionary
             EventLoader.Of(this._client).Load(this);
         }
 
-        public BlocksAreaDictionary(IBlockAreaEnumerable blockArea, BotBitsClient client) : this(blockArea, client, DefaultBlockFilter.Value)
+        public BlocksAreaDictionary(IBlockAreaEnumerable blockArea, BotBitsClient client) : this(blockArea, client, null)
         {
         }
 
@@ -51,22 +52,28 @@ namespace BotBits.WorldDictionary
         {
             this._lock.EnterWriteLock();
 
-            this.InternalForeground.Clear();
-            this.InternalBackground.Clear();
-
-            this.Width = this._blockArea.Area.Width;
-            this.Height = this._blockArea.Area.Height;
-
-            for (var y = 0; y < this.Height; y++)
+            try
             {
-                for (var x = 0; x < this.Width; x++)
-                {
-                    this.InternalForeground.Add(this._blockArea.At(x, y).Foreground.Block, new Point(x, y));
-                    this.InternalBackground.Add(this._blockArea.At(x, y).Background.Block, new Point(x, y));
-                }
-            }
+                this.InternalForeground.Clear();
+                this.InternalBackground.Clear();
 
-            this._lock.ExitWriteLock();
+                this.Width = this._blockArea.Area.Width;
+                this.Height = this._blockArea.Area.Height;
+
+                for (var y = 0; y < this.Height; y++)
+                {
+                    for (var x = 0; x < this.Width; x++)
+                    {
+                        this.InternalForeground.Add(this._blockArea.At(x, y).Foreground.Block, new Point(x, y));
+                        this.InternalBackground.Add(this._blockArea.At(x, y).Background.Block, new Point(x, y));
+                    }
+                }
+
+            }
+            finally
+            {
+                this._lock.ExitWriteLock();
+            }
         }
 
         [EventListener]
@@ -91,22 +98,30 @@ namespace BotBits.WorldDictionary
         private void On(ForegroundPlaceEvent e)
         {
             this._lock.EnterReadLock();
-
-            if (!this.InternalForeground.Remove(e.Old.Block, new Point(e.X, e.Y))) return; // Unknown block!
-            this.InternalForeground.Add(e.New.Block, new Point(e.X, e.Y));
-
-            this._lock.ExitReadLock();
+            try
+            {
+                if (!this.InternalForeground.Remove(e.Old.Block, new Point(e.X, e.Y))) return; // Unknown block!
+                this.InternalForeground.Add(e.New.Block, new Point(e.X, e.Y));
+            }
+            finally
+            {
+                this._lock.ExitReadLock();
+            }
         }
 
         [EventListener]
         private void On(BackgroundPlaceEvent e)
         {
             this._lock.EnterReadLock();
-
-            if (!this.InternalBackground.Remove(e.Old.Block, new Point(e.X, e.Y))) return; // Unknown block!
-            this.InternalBackground.Add(e.New.Block, new Point(e.X, e.Y));
-
-            this._lock.ExitReadLock();
+            try
+            {
+                if (!this.InternalBackground.Remove(e.Old.Block, new Point(e.X, e.Y))) return; // Unknown block!
+                this.InternalBackground.Add(e.New.Block, new Point(e.X, e.Y));
+            }
+            finally
+            {
+                this._lock.ExitReadLock();
+            }
         }
     }
 }

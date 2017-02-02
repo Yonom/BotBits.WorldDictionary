@@ -2,16 +2,6 @@ namespace BotBits.WorldDictionary
 {
     public static class WorldDictionaryExtensions
     {
-        public static WorldDictionary ToWorldDictionary(this IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
-        {
-            return new WorldDictionary(worldArea, filter);
-        }
-
-        public static WorldDictionary ToWorldDictionary(this IWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea, IBlockFilter filter)
-        {
-            return new WorldDictionary(worldArea, filter);
-        }
-
         public static WorldDictionary ToWorldDictionary(this IReadOnlyWorldAreaEnumerable<ForegroundBlock, BackgroundBlock> worldArea)
         {
             return new WorldDictionary(worldArea);

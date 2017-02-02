@@ -50,7 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlockQuery\AggregateBlockQuery.cs" />
+    <Compile Include="BlockFilter\CompositeBlockFilter.cs" />
+    <Compile Include="BlockQuery\BlockNestedQuery.cs" />
     <Compile Include="BlockQuery\BlockQueryExtensions.cs" />
     <Compile Include="BlockFilter\DefaultBlockFilter.cs" />
     <Compile Include="PointSet\PointSet.cs" />

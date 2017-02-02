@@ -41,7 +41,7 @@ namespace BotBits.WorldDictionary
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)this._set).GetEnumerator();
+            return this.GetEnumerator();
         }
 
         public bool Contains(Point point)

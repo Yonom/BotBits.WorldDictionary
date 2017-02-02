@@ -31,7 +31,7 @@ namespace BotBits.WorldDictionary
             {
                 var id = this._generator.GetId(block);
 
-                if (this._filter.ShouldIndex(id, block) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
+                if (this._filter?.ShouldIndex(id, block) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
 
                 var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
                 var res = dic.GetOrAdd(block, _ => new TPointSet());
@@ -40,27 +40,28 @@ namespace BotBits.WorldDictionary
             }
         }
 
-        public IBlockQuery<TId, TItem> this[TId id]
+        public IBlockQuery<TId, TItem> this[TId id] => this.GetByBlock(id).ToQuery();
+
+        public IBlockNestedQuery<TId, TBlock, TItem> GetByBlock(TId id)
         {
-            get
-            {
-                if (this._filter.ShouldIndex(id, null) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
+            if (this._filter?.ShouldIndex(id, null) == false) throw new NotSupportedException("This Dictionary does not support the given block.");
 
-                var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
+            var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
 
-                return new AggregateBlockQuery<TId, TBlock, TItem, TPointSet>(id, dic, this._generator);
-            }
+            return new BlockNestedQuery<TId, TBlock, TItem>(id, dic
+                .Where(i => i.Value.Any())
+                .Select(i => new BlockQuery<TId, TBlock, TItem, TPointSet>(i.Key, i.Value, this._generator))
+                .ToArray<IBlockQuery<TBlock, TItem>>(),
+                this._generator);
         }
 
-        public IEnumerable<KeyValuePair<TId, IEnumerable<IBlockQuery<TBlock, TItem>>>> GroupedByIdThenByBlock
+        public IEnumerable<IBlockNestedQuery<TId, TBlock, TItem>> GroupedByIdThenByBlock
         {
             get
             {
-                return this._items
-                    .Select(i => new KeyValuePair<TId, IEnumerable<IBlockQuery<TBlock, TItem>>>(i.Key, i.Value
-                        .Where(v => v.Value.Any())
-                        .Select(v => this[v.Key])))
-                    .Where(i => i.Value.Any());
+                return this._items.Keys
+                    .Select(this.GetByBlock)
+                    .Where(i => i.Any());
             }
         }
 
@@ -99,7 +100,7 @@ namespace BotBits.WorldDictionary
         {
             var id = this._generator.GetId(block);
 
-            //if (this._filter.ShouldIndex(id, block) == false) return false;
+            if (this._filter?.ShouldIndex(id, block) == false) return;
 
             var dic = this._items.GetOrAdd(id, _ => new ConcurrentDictionary<TBlock, TPointSet>());
             var res = dic.GetOrAdd(block, _ => new TPointSet());
@@ -110,6 +111,8 @@ namespace BotBits.WorldDictionary
         internal bool Remove(TBlock block, Point point)
         {
             var id = this._generator.GetId(block);
+
+            if (this._filter?.ShouldIndex(id, block) == false) return true;
 
             ConcurrentDictionary<TBlock, TPointSet> dic;
             if (!this._items.TryGetValue(id, out dic)) return false;

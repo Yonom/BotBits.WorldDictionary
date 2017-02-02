@@ -14,6 +14,6 @@ namespace BotBits.WorldDictionary
 
         IEnumerable<IBlockQuery<TId, TItem>> GroupedById { get; }
         IEnumerable<IBlockQuery<TBlock, TItem>> GroupedByBlock { get; }
-        IEnumerable<KeyValuePair<TId, IEnumerable<IBlockQuery<TBlock, TItem>>>> GroupedByIdThenByBlock { get; }
+        IEnumerable<IBlockNestedQuery<TId, TBlock, TItem>> GroupedByIdThenByBlock { get; }
     }
 }
