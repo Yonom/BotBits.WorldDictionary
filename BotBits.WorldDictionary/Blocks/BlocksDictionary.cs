@@ -2,7 +2,7 @@ using System;
 
 namespace BotBits.WorldDictionary
 {
-    public sealed class BlocksDictionary : Package<BlocksDictionary>, IReadOnlyWorldDictionary<BlocksItem>
+    public sealed class BlocksDictionary : Package<BlocksDictionary>, IReadOnlyWorldDictionary<BlocksItem>, IDisposable
     {
         private BlocksAreaDictionary _blocksAreaDictionary;
 
@@ -26,6 +26,11 @@ namespace BotBits.WorldDictionary
         private void BlocksDictionary_InitializeFinish(object sender, EventArgs e)
         {
             this._blocksAreaDictionary = new BlocksAreaDictionary(Blocks.Of(this.BotBits), this.BotBits);
+        }
+
+        public void Dispose()
+        {
+            this._blocksAreaDictionary.Dispose();
         }
     }
 }

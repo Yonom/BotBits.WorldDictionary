@@ -50,10 +50,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockFilter\BlockFilter.cs" />
     <Compile Include="BlockFilter\CompositeBlockFilter.cs" />
+    <Compile Include="BlockFilter\CompositeBlockFilterExtensions.cs" />
     <Compile Include="BlockQuery\BlockNestedQuery.cs" />
     <Compile Include="BlockQuery\BlockQueryExtensions.cs" />
-    <Compile Include="BlockFilter\DefaultBlockFilter.cs" />
     <Compile Include="PointSet\PointSet.cs" />
     <Compile Include="Generators\BackgroundDictionaryLayerGenerator.cs" />
     <Compile Include="Blocks\BlocksAreaDictionary.cs" />
